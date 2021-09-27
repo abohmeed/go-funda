@@ -1,2 +1,3 @@
-*_cache*
+listings_cache/
 .idea/
+*.json
