@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly/v2"
 	"log"
 	"os"
@@ -31,6 +32,7 @@ func main() {
 	c := colly.NewCollector(
 		// Visit only domains: coursera.org, www.coursera.org
 		colly.AllowedDomains("funda.nl","www.funda.nl"),
+		colly.UserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36"),
 
 		// Cache responses to prevent multiple download of pages
 		// even if the collector is restarted
@@ -41,33 +43,18 @@ func main() {
 	//detailCollector := c.Clone()
 
 	//courses := make([]Course, 0, 200)
-
-	// On every <a> element which has "href" attribute call callback
-	// https://www.funda.nl/en/koop/amersfoort/huis-42447075-babylon-14/?navigateSource=resultlist
-	c.OnHTML("a[href]", func(e *colly.HTMLElement) {
-		//link := e.Attr("href")
-		//if strings.HasPrefix(link,"https://www.funda.nl/en/koop/") {
-		//	e.Request.Visit(link)
-		//	fmt.Println("Visiting",link)
-		//} else {
-		//	fmt.Println(link)
-		//}
-		//fmt.Println(link)
+	c.OnHTML("div.search-result__header-title-col", func(e *colly.HTMLElement) {
+		e.DOM.Find("a").EachWithBreak(func(_ int, s *goquery.Selection) bool {
+			fmt.Println(s.Attr("href"))
+			return false
+		})
 	})
-	c.OnRequest(func(f *colly.Request){
-		f.Headers.Set("Referrer","https://www.funda.nl/")
-		f.Headers.Set("User-Agent","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36")
-	})
-	c.OnResponse(func(r *colly.Response){
-		fmt.Println(string(r.Body))
-	})
-
 
 	// Before making a request print "Visiting ..."
 	c.OnRequest(func(r *colly.Request) {
 		log.Println("visiting", r.URL.String())
 	})
-	err = c.Visit("https://www.funda.nl/en/koop/amersfoort/beschikbaar/0-400000/100+woonopp/woonhuis/5+kamers/bouwperiode-1991-2000/bouwperiode-2001-2010/bouwperiode-2011-2020/bouwperiode-na-2020/energielabel-a/energielabel-b/")
+	err = c.Visit("https://www.funda.nl/en/koop/amersfoort/")
 	if err != nil {
 		fmt.Println(err)
 	}
