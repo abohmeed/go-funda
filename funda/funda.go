@@ -72,7 +72,7 @@ func GetListings(domain string, city string) []Listing {
 	if err != nil {
 		fmt.Println(err)
 	}
-	detailCollector.OnHTML("div.object-primary", func(e *colly.HTMLElement) {
+	detailCollector.OnHTML("body", func(e *colly.HTMLElement) {
 		title := strings.TrimSpace(e.DOM.Find("span.object-header__title").Text())
 		fullAddress := strings.TrimSpace(e.DOM.Find("span.object-header__subtitle.fd-color-dark-3").Text())
 		field := strings.Split(fullAddress, "\n")

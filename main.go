@@ -1,25 +1,9 @@
 package main
 
-import (
-	"encoding/json"
-	"github.com/abohmeed/go-funda/funda"
-	"log"
-	"os"
-)
+import "github.com/abohmeed/go-funda/funda"
+import "github.com/abohmeed/go-funda/SQLite"
 
 func main() {
-	city := os.Args[1]
-	fName := city + ".json"
-	file, err := os.Create(fName)
-	if err != nil {
-		log.Fatalf("Cannot create file %q: %s\n", fName, err)
-		return
-	}
-	defer file.Close()
-	listings := funda.GetListings("funda.nl",city)
-	enc := json.NewEncoder(file)
-	enc.SetIndent("", "  ")
-
-	// Dump json to the standard output
-	enc.Encode(listings)
+	listings := funda.GetListings("funda.nl", "amersfoort")
+	SQLite.Save(listings, "amersfoort")
 }
